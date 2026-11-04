@@ -8,6 +8,10 @@ The project focuses on what happens between downloading a file and trusting a ch
 
 [Build checks](https://github.com/anushaxrama/atlasiq/actions/workflows/ci.yml) | [Architecture](docs/ARCHITECTURE.md) | [Backfill results](docs/MULTI_MONTH_BACKFILL.md) | [Runbook](docs/RUNBOOK.md)
 
+## Review guide
+
+Start with the [engineering case study](portfolio/case-study.md) for the problem and design decisions, the [overview screenshot](portfolio/screenshots/overview.png) for the interface, and the [three-month backfill evidence](docs/evidence/multi-month-backfill.json) for the recorded execution. The setup and operational detail below explain how to reproduce the local application.
+
 ## What is included
 
 - Monthly TLC ingestion with bounded retries, file checksums, source-schema validation, and a reproducible sample option.
