@@ -78,3 +78,7 @@ The equal monthly sample caps do not estimate city-wide demand growth. Weather c
 This is a local application. Hosting, authentication, tested backup restoration, external alerts, migrations, and serving-table swaps during rebuilds remain deployment work. Source publication and NOAA coverage must be checked before loading newer months.
 
 Trip data comes from [NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page); weather comes from [NOAA GSOD](https://www.ncei.noaa.gov/products/land-based-station/global-summary-of-the-day). See [sources and attribution](docs/SOURCES.md), [data definitions](docs/DATA_DICTIONARY.md), and [design decisions](docs/ADRS.md).
+
+## Latest local check
+
+See [local verification](docs/LOCAL_VERIFICATION.md) for the November 5, 2026 setup, runtime checks, and remaining test boundaries.
