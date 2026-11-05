@@ -6,7 +6,7 @@ The project focuses on what happens between downloading a file and trusting a ch
 
 ![AtlasIQ dashboard](portfolio/screenshots/overview.png)
 
-[Build checks](https://github.com/anushaxrama/atlasiq/actions/workflows/ci.yml) | [Architecture](docs/ARCHITECTURE.md) | [Backfill results](docs/MULTI_MONTH_BACKFILL.md) | [Runbook](docs/RUNBOOK.md)
+[Build checks](https://github.com/anusharama100/atlasiq/actions/workflows/ci.yml) | [Architecture](docs/ARCHITECTURE.md) | [Backfill results](docs/MULTI_MONTH_BACKFILL.md) | [Runbook](docs/RUNBOOK.md)
 
 ## Review guide
 
@@ -47,7 +47,7 @@ These are local execution results, not data bundled with the repository. A fresh
 Install Docker Engine or Docker Desktop with Compose, then:
 
 ```sh
-git clone https://github.com/anushaxrama/atlasiq.git
+git clone https://github.com/anusharama100/atlasiq.git
 cd atlasiq
 docker compose up -d postgres
 docker compose build api
@@ -248,7 +248,7 @@ Alternatively, run `pnpm exec playwright install chromium`, then `pnpm test:e2e`
 
 Recorded checks include 28 Python tests, 17 dbt tests, a complete five-task Airflow execution, and 12 desktop/mobile browser checks against the three-month warehouse. Browser checks cover all seven views, date and zone filters, cross-month totals, keyboard chart inspection, CSV reconciliation, comparisons, empty states, and outage recovery.
 
-[GitHub Actions](https://github.com/anushaxrama/atlasiq/actions/workflows/ci.yml) runs Python linting, formatting, types, and tests with a separate PostgreSQL service; checks and builds the frontend; validates Compose; and builds the Airflow image to parse its DAG. The real-data browser journeys and historical backfill are separate recorded local checks. CI does not download and recreate the entire historical dataset on each push.
+[GitHub Actions](https://github.com/anusharama100/atlasiq/actions/workflows/ci.yml) runs Python linting, formatting, types, and tests with a separate PostgreSQL service; checks and builds the frontend; validates Compose; and builds the Airflow image to parse its DAG. The real-data browser journeys and historical backfill are separate recorded local checks. CI does not download and recreate the entire historical dataset on each push.
 
 ## Limits and follow-up work
 
