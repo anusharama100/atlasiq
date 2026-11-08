@@ -1,24 +1,18 @@
 # AtlasIQ
 
-A data pipeline and dashboard for exploring NYC Yellow taxi trips. AtlasIQ takes the monthly TLC files through validation, PostgreSQL, and dbt before making the results available through FastAPI and a TypeScript dashboard.
+A pipeline and dashboard for exploring NYC Yellow taxi trips. It takes monthly source files through validation, PostgreSQL, and dbt before serving the results through FastAPI and a TypeScript dashboard.
 
-I built the project around a practical question: how do you know the numbers in a chart came from a complete, traceable load? Source checksums, rejected-record storage, partition replacement, and publication checks make that process visible.
+I focused on making each chart traceable to its source: checksums, rejected rows, load history, and publication checks are part of the application.
+
+**Python · PostgreSQL · dbt · FastAPI · Airflow · TypeScript · Docker**
 
 ![AtlasIQ dashboard](portfolio/screenshots/overview.png)
 
-[Case study](portfolio/case-study.md) · [Architecture](docs/ARCHITECTURE.md) · [Recorded verification](docs/VERIFICATION.md) · [CI runs](https://github.com/anusharama100/atlasiq/actions)
+[Case study](portfolio/case-study.md) · [Architecture](docs/ARCHITECTURE.md) · [Verification](docs/VERIFICATION.md)
 
-## What to look at
+## Run the demo
 
-- **Ingestion:** monthly Parquet downloads, bounded retries, checksums, schema checks, and deterministic sampling.
-- **Warehouse:** accepted and rejected records, source/run history, an incremental dbt fact table, dimensions, and analytical marts.
-- **Publication:** newly loaded data stays out of the analytical API until transformations and quality checks finish.
-- **Analysis:** demand by date, hour, and zone; fare and trip-efficiency comparisons; weather context; and twelve SQL analyses.
-- **Interface:** seven dashboard views, date and zone filters, keyboard chart inspection, and CSV exports.
-
-## Run locally
-
-Install Docker with Compose, then:
+Install Docker with Compose.
 
 ```sh
 git clone https://github.com/anusharama100/atlasiq.git
@@ -29,56 +23,35 @@ docker compose run --rm api atlasiq demo --month 2025-01 --limit 100000
 docker compose up -d api
 ```
 
-Open [localhost:8020](http://127.0.0.1:8020); API documentation is at [/docs](http://127.0.0.1:8020/docs).
+Open the [dashboard on port 8020](http://127.0.0.1:8020) or [API docs](http://127.0.0.1:8020/docs). The first run downloads the full January file, about 59 MB, plus reference data before selecting 100,000 records. It needs network access.
 
-The first run downloads the full January source file, about 59 MB, plus reference data, then selects 100,000 records. It needs network access. A fresh clone does not include source files or a populated database. PostgreSQL uses local port 5544; the optional Airflow UI uses 8082.
+PostgreSQL uses local port 5544. A fresh clone has no populated database.
 
-For a longer historical range:
+## What to explore
 
-```sh
-docker compose exec api atlasiq backfill --start 2025-02 --end 2025-03 --limit 100000
-```
+- Demand by date, hour, and zone, plus fare and trip-efficiency comparisons.
+- Rejected records and source/run history alongside accepted trips.
+- Date and zone filters, keyboard chart inspection, and CSV exports.
+- Monthly partition replay without duplicating trip identities.
 
-See the [backfill guide](docs/MULTI_MONTH_BACKFILL.md) for partition replay and verification.
+New loads stay out of the analytical API until dbt transformations and quality checks finish.
 
-## How it is built
+## Code to start with
 
-**Python, PostgreSQL, dbt, FastAPI, Airflow, TypeScript, SVG, and Docker.** The frontend has no runtime framework; compiled assets are included for the Docker path.
+- `src/atlasiq/` — ingestion, CLI, API, and compiled interface.
+- `frontend/` — TypeScript dashboard source.
+- `warehouse/` — dbt models and tests.
+- `orchestration/` — Airflow workflow.
+- `analyses/` — twelve SQL analyses.
 
-```text
-TLC trips + zone lookup + NOAA observations + holiday calendar
-  -> landed files and source checksums
-  -> validation, accepted records, and quarantine
-  -> dbt dimensions, facts, and analytical marts
-  -> quality checks and publication
-  -> API, dashboard, CSV, and SQL analyses
-```
+See the [runbook](docs/RUNBOOK.md) for native development and [backfill guide](docs/MULTI_MONTH_BACKFILL.md) for multi-month loads.
 
-| Directory | Contents |
-| --- | --- |
-| `src/atlasiq/` | Ingestion, database, CLI, API, and compiled interface |
-| `frontend/` | TypeScript dashboard source |
-| `warehouse/` | dbt models, tests, and calendar seed |
-| `orchestration/` | Airflow DAG and image |
-| `analyses/` | Twelve SQL analyses |
-| `tests/`, `docs/` | Tests, operational notes, and execution evidence |
+## Recorded results and scope
 
-Native development uses Python 3.12, uv, PostgreSQL, Node 24, and pnpm 11.25. Configuration and operational details are in the [runbook](docs/RUNBOOK.md) and [deployment guide](docs/DEPLOYMENT.md).
+The checked-in [three-month record](docs/evidence/multi-month-backfill.json) covers 300,000 selected records: 284,899 accepted trips and 15,101 rejections. Replaying February preserved its counts and trip-ID fingerprints. Both combined builds passed 17 dbt tests.
 
-## Recorded results
+The [verification notes](docs/VERIFICATION.md) also record 28 Python tests, a five-task Airflow run, and 12 browser checks. These are captured local runs, not hosted-service measurements.
 
-The checked-in [three-month execution record](docs/evidence/multi-month-backfill.json) covers January–March 2025: 300,000 selected records, 284,899 accepted trips, and 15,101 rejections. February was replayed without changing partition counts or trip-ID fingerprints. Both combined builds passed all 17 dbt tests.
+Equal monthly sample caps do not estimate city-wide demand growth. Weather comparisons are descriptive. Full-month throughput, hosting, authentication, and backup restoration remain unverified. See [local setup checks](docs/LOCAL_VERIFICATION.md) and the [deployment guide](docs/DEPLOYMENT.md).
 
-The [verification notes](docs/VERIFICATION.md) also record 28 Python tests, a complete five-task Airflow execution, and 12 desktop/mobile browser checks. These are recorded local runs; they are not a hosted-service uptime record or a fresh benchmark on every checkout.
-
-## Boundaries
-
-The equal monthly sample caps do not estimate city-wide demand growth. Weather comparisons are descriptive, and one station's daily readings are only a city-level proxy. Full-month throughput has not been benchmarked.
-
-This is a local application. Hosting, authentication, tested backup restoration, external alerts, migrations, and serving-table swaps during rebuilds remain deployment work. Source publication and NOAA coverage must be checked before loading newer months.
-
-Trip data comes from [NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page); weather comes from [NOAA GSOD](https://www.ncei.noaa.gov/products/land-based-station/global-summary-of-the-day). See [sources and attribution](docs/SOURCES.md), [data definitions](docs/DATA_DICTIONARY.md), and [design decisions](docs/ADRS.md).
-
-## Latest local check
-
-See [local verification](docs/LOCAL_VERIFICATION.md) for the November 5, 2026 setup, runtime checks, and remaining test boundaries.
+Data: [NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) and [NOAA GSOD](https://www.ncei.noaa.gov/products/land-based-station/global-summary-of-the-day). Preserve the attribution in [sources](docs/SOURCES.md).
